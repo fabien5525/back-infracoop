@@ -51,6 +51,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column, Groups(['post:utilisateur'])]
     private ?string $password = null;
 
+    #[ORM\OneToOne(inversedBy: 'utilisateur', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Client $Client = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,5 +124,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->Client;
+    }
+
+    public function setClient(Client $Client): self
+    {
+        $this->Client = $Client;
+
+        return $this;
     }
 }

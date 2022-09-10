@@ -39,6 +39,9 @@ class Client
     #[ORM\OneToMany(mappedBy: 'Client', targetEntity: Location::class)]
     private Collection $locations;
 
+    #[ORM\OneToOne(mappedBy: 'Client', cascade: ['persist', 'remove'])]
+    private ?Utilisateur $utilisateur = null;
+
     public function __construct()
     {
         $this->locations = new ArrayCollection();
@@ -147,6 +150,23 @@ class Client
                 $location->setClient(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(Utilisateur $utilisateur): self
+    {
+        // set the owning side of the relation if necessary
+        if ($utilisateur->getClient() !== $this) {
+            $utilisateur->setClient($this);
+        }
+
+        $this->utilisateur = $utilisateur;
 
         return $this;
     }
