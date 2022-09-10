@@ -7,12 +7,29 @@ use App\Repository\UtilisateurRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     #open post method for registration
-    collectionOperations: ['post'],
-    itemOperations: ['get'],
+    collectionOperations: ['get' => [
+        'security' => 'is_granted("ROLE_ADMIN")',
+        'security_message' => 'Only admins can access this route',
+        'normalization_context' => ['groups' => ['get:utilisateur']]
+    ],'post' => [
+        'normalization_context' => ['groups' => ['post:utilisateur']]
+    ]],
+    itemOperations: ['get' => [
+        'security' => 'is_granted("ROLE_ADMIN") or object == user',
+        'security_message' => 'Only admins can access this route or user himself',
+        'normalization_context' => ['groups' => ['get:utilisateur']]
+    ],'put' => [
+        'security' => 'is_granted("ROLE_ADMIN") or object == user',
+        'security_message' => 'Only admins can access this route or user himself',
+    ],'delete' => [
+        'security' => 'is_granted("ROLE_ADMIN") or object == user',
+        'security_message' => 'Only admins can access this route or user himself',
+        'normalization_context' => ['groups' => ['get:utilisateur']]
+    ]],
 )]
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
@@ -22,16 +39,16 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 180, unique: true), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?string $email = null;
 
-    #[ORM\Column]
+    #[ORM\Column, Groups(['get:utilisateur'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
-    #[ORM\Column]
+    #[ORM\Column, Groups(['post:utilisateur'])]
     private ?string $password = null;
 
     public function getId(): ?int
@@ -90,7 +107,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPassword(string $password): self
     {
-        $this->password = $password;
+        //hash password
+        $this->password = password_hash($password, PASSWORD_BCRYPT);
 
         return $this;
     }
