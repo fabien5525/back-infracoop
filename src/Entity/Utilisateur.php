@@ -14,18 +14,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
     collectionOperations: ['get' => [
         'security' => 'is_granted("ROLE_ADMIN")',
         'security_message' => 'Only admins can access this route',
-        'normalization_context' => ['groups' => ['get:utilisateur']]
-    ],'post' => [
-        'normalization_context' => ['groups' => ['post:utilisateur']]
+        'normalization_context' => ['groups' => ['get:utilisateur']],
+    ], 'post' => [
+        'normalization_context' => ['groups' => ['post:utilisateur']],
+        'denormalization_context' => ['groups' => ['post:utilisateur']]
     ]],
     itemOperations: ['get' => [
         'security' => 'is_granted("ROLE_ADMIN") or object == user',
         'security_message' => 'Only admins can access this route or user himself',
         'normalization_context' => ['groups' => ['get:utilisateur']]
-    ],'put' => [
+    ], 'put' => [
         'security' => 'is_granted("ROLE_ADMIN") or object == user',
         'security_message' => 'Only admins can access this route or user himself',
-    ],'delete' => [
+    ], 'delete' => [
         'security' => 'is_granted("ROLE_ADMIN") or object == user',
         'security_message' => 'Only admins can access this route or user himself',
         'normalization_context' => ['groups' => ['get:utilisateur']]
@@ -51,8 +52,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column, Groups(['post:utilisateur'])]
     private ?string $password = null;
 
-    #[ORM\OneToOne(inversedBy: 'utilisateur', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\OneToOne(inversedBy: 'utilisateur', cascade: ['persist', 'remove']), ORM\JoinColumn(nullable: false), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?Client $Client = null;
 
     public function getId(): ?int

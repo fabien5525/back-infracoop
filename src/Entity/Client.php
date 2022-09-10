@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\ClientRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource()]
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
@@ -18,25 +19,25 @@ class Client
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?string $Nom = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?string $Prenom = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?\DateTimeInterface $DateDeNaissance = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?string $Adresse = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?string $Telephone = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255), Groups(['get:utilisateur', 'post:utilisateur'])]
     private ?string $NumeroDePermis = null;
 
-    #[ORM\OneToMany(mappedBy: 'Client', targetEntity: Location::class)]
+    #[ORM\OneToMany(mappedBy: 'Client', targetEntity: Location::class), Groups(['get:utilisateur'])]
     private Collection $locations;
 
     #[ORM\OneToOne(mappedBy: 'Client', cascade: ['persist', 'remove'])]
